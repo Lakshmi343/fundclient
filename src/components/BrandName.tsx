@@ -74,9 +74,9 @@ const Brand = ({ asLink, variant, ...others }: IProps) => {
     </UnstyledButton>
   ) : (
     <Title className={classes.title} {...others}>
-      Crowd
+      Fund
       <Text component="span" className={classes.highlight} inherit>
-        Up
+        Harbour
       </Text>
     </Title>
   );

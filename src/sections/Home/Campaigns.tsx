@@ -44,7 +44,9 @@ const CampaignsSection = ({ boxProps, titleProps }: IProps) => {
   useEffect(() => {
     const fetchCampaigns = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/campaigns/campaigns");
+        const response = await axios.get(
+          "http://localhost:5000/api/campaigns/campaigns"
+        );
         setCampaigns(response.data.campaigns);
       } catch (error) {
         console.error("Error fetching campaigns:", error);

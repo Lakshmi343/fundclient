@@ -34,7 +34,10 @@ export type ICampaign = {
   status: "draft" | "active" | "completed" | "cancelled";
   createdAt: string;
   updatedAt: string;
+  daysLeft: any;
   __v: number;
+  achievedAmount: any;
+  investments: any;
 };
 
 export interface ITestimonial {
