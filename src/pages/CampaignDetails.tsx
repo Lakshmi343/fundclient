@@ -113,9 +113,9 @@ const CampaignDetailsPage = (): JSX.Element => {
                 <Stack>
                   <Card padding="md" shadow="sm">
                     <Card.Section>
-                      <Image 
-                        src={getImageUrl(campaign.image)} 
-                        height={480} 
+                      <Image
+                        src={getImageUrl(campaign.image)}
+                        height={480}
                         alt={campaign.title}
                       />
                     </Card.Section>
@@ -127,7 +127,9 @@ const CampaignDetailsPage = (): JSX.Element => {
                           <UnstyledButton component={Anchor}>
                             <Flex gap="xs" align="center">
                               <Avatar
-                                src={getImageUrl(campaign.creator.profile.picture)}
+                                src={getImageUrl(
+                                  campaign.creator.profile.picture
+                                )}
                                 radius="xl"
                                 size="sm"
                               />
@@ -150,7 +152,7 @@ const CampaignDetailsPage = (): JSX.Element => {
                             <UnstyledButton component={Anchor}>
                               <Flex gap="xs" align="center">
                                 <Avatar
-                                  src={getImageUrl(campaign.creator.profile.picture)}
+                                  src={getImageUrl(campaign.image)}
                                   radius="xl"
                                   size="sm"
                                 />
@@ -181,13 +183,21 @@ const CampaignDetailsPage = (): JSX.Element => {
                               raised of {campaign.fundingGoal}
                             </Text>
                           </Flex>
-                          <Progress 
-                            value={(campaign.achievedAmount / campaign.fundingGoal) * 100} 
-                            size="md" 
+                          <Progress
+                            value={
+                              (campaign.achievedAmount / campaign.fundingGoal) *
+                              100
+                            }
+                            size="md"
                           />
                           <Flex justify="space-between">
                             <Text fw={500}>
-                              {Math.round((campaign.achievedAmount / campaign.fundingGoal) * 100)}% Funded
+                              {Math.round(
+                                (campaign.achievedAmount /
+                                  campaign.fundingGoal) *
+                                  100
+                              )}
+                              % Funded
                             </Text>
                             <Text fw={500}>
                               {campaign.investments.length} Donors
@@ -255,7 +265,7 @@ const CampaignDetailsPage = (): JSX.Element => {
                     <Text {...subTitleProps} mb="sm">
                       Organizer
                     </Text>
-                    <UserCard 
+                    <UserCard
                       name={campaign.creator.name}
                       email={campaign.creator.email}
                       image={getImageUrl(campaign.creator.profile.picture)}
@@ -288,13 +298,20 @@ const CampaignDetailsPage = (): JSX.Element => {
                         <Text fw={500} align="center" color="dimmed">
                           raised of {campaign.fundingGoal}
                         </Text>
-                        <Progress 
-                          value={(campaign.achievedAmount / campaign.fundingGoal) * 100} 
-                          size="md" 
+                        <Progress
+                          value={
+                            (campaign.achievedAmount / campaign.fundingGoal) *
+                            100
+                          }
+                          size="md"
                         />
                         <Flex justify="space-between">
                           <Text fw={500}>
-                            {Math.round((campaign.achievedAmount / campaign.fundingGoal) * 100)}% Funded
+                            {Math.round(
+                              (campaign.achievedAmount / campaign.fundingGoal) *
+                                100
+                            )}
+                            % Funded
                           </Text>
                           <Text fw={500}>
                             {campaign.investments.length} Donors
@@ -363,8 +380,8 @@ const CampaignDetailsPage = (): JSX.Element => {
                         </Accordion.Control>
                         <Accordion.Panel>
                           Your payment is sent directly to{" "}
-                          {campaign.creator.name} so it immediately helps
-                          their campaign.
+                          {campaign.creator.name} so it immediately helps their
+                          campaign.
                         </Accordion.Panel>
                       </Accordion.Item>
 

@@ -21,6 +21,8 @@ import SalesPage from "../pages/adminPanel/SalesPage";
 import OrdersPage from "../pages/adminPanel/OrdersPage";
 import AnalyticsPage from "../pages/adminPanel/AnalyticsPage";
 import SettingsPage from "../pages/adminPanel/SettingsPage";
+import PaymentSuccess from "../pages/PaymentSuccess";
+import PaymentFailure from "../pages/PaymentFailure";
 
 const router = createBrowserRouter([
   {
@@ -96,6 +98,30 @@ const router = createBrowserRouter([
         path: "",
         index: true,
         element: <CreateCampaignPage />,
+      },
+    ],
+  },
+
+  {
+    path: "successPayment",
+    element: <PublicLayout />,
+    children: [
+      {
+        path: ":id",
+        element: <PaymentSuccess />,
+        errorElement: <Error404Page />,
+      },
+    ],
+  },
+
+  {
+    path: "paymentFailed",
+    element: <PublicLayout />,
+    children: [
+      {
+        path: "",
+        index: true,
+        element: <PaymentFailure />,
       },
     ],
   },

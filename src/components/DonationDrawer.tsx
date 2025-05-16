@@ -1,4 +1,3 @@
-
 // import { useState, useEffect } from "react";
 // import {
 //   ActionIcon,
@@ -99,7 +98,7 @@
 //       );
 
 //       const stripe = await loadStripe("your_stripe_publishable_key");
-      
+
 //       if (!stripe) {
 //         throw new Error("Stripe failed to initialize");
 //       }
@@ -337,8 +336,8 @@
 //                 <Text>Total due today</Text>
 //                 <Text fw={500}>${totalAmount.toFixed(2)}</Text>
 //               </Group>
-//               <Button 
-//                 size="lg" 
+//               <Button
+//                 size="lg"
 //                 onClick={handleDonation}
 //                 disabled={loading}
 //                 leftIcon={loading ? <Loader size="sm" /> : null}
@@ -424,13 +423,32 @@ interface IProps extends Pick<DrawerProps, "opened" | "onClose" | "size"> {
   iconSize: number;
 }
 
+interface PaymentDetails {
+  status: string;
+  amount: number;
+  currency: string;
+  paymentMethod: {
+    brand: string;
+    last4: string;
+    exp_month: number;
+    exp_year: number;
+  };
+  billingDetails: {
+    name: string;
+    email: string;
+  };
+}
+
 const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
   const [payment, setPayment] = useState("");
-  const [donationAmount, setDonationAmount] = useState<number | undefined>(undefined);
+  const [donationAmount, setDonationAmount] = useState<any>(undefined);
   const [tipPercentage, setTipPercentage] = useState(0);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const theme = useMantineTheme();
+  const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(
+    null
+  );
 
   const paperProps: PaperProps = {
     p: "md",
@@ -441,6 +459,38 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
   // Calculate totals
   const tipAmount = donationAmount ? (donationAmount * tipPercentage) / 100 : 0;
   const totalAmount = donationAmount ? donationAmount + tipAmount : 0;
+
+  const stripePromise = loadStripe(
+    "pk_test_51R7DNdRKELkB9tkTXpDsLnjeh4ZNd4qWPpXWXkssoYK9vIYSqsJjrPDrYTlFvR5myKpXplUe8a8Zx02lgk0nv0Xv00R3bx7bCe"
+  );
+
+  const handleClick = async () => {
+    const stripe = await stripePromise;
+    const amountInCents = totalAmount * 100;
+    const user = JSON.parse(localStorage.getItem("user") || "{}");
+
+    const userId = user.id;
+    const response = await fetch(
+      "http://localhost:5000/api/create-checkout-session",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          totalAmount: amountInCents,
+          investorId: userId,
+          campaignId: campaign?._id,
+        }),
+      }
+    );
+
+    const session = await response.json();
+
+    if (stripe) {
+      await stripe.redirectToCheckout({ sessionId: session.id });
+    }
+  };
 
   const handleDonation = async () => {
     if (!donationAmount || donationAmount <= 0) {
@@ -466,37 +516,6 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
     setLoading(true);
 
     try {
-      // First create a payment intent with Stripe
-      const stripeResponse = await axios.post(
-        "http://localhost:5000/api/payment/create-payment-intent",
-        {
-          amount: totalAmount * 100, // Convert to cents
-          currency: "usd",
-        }
-      );
-
-      const stripe = await loadStripe("your_stripe_publishable_key");
-      
-      if (!stripe) {
-        throw new Error("Stripe failed to initialize");
-      }
-
-      const { error } = await stripe.confirmPayment({
-        clientSecret: stripeResponse.data.clientSecret,
-        // For card payments
-        elementsOptions: {
-          // If using Stripe Elements
-        },
-        confirmParams: {
-          return_url: window.location.href,
-          receipt_email: "user@example.com", // You should collect this from the form
-        },
-      });
-
-      if (error) {
-        throw error;
-      }
-
       // If payment succeeds, record the investment
       const investmentResponse = await axios.post(
         `http://localhost:5000/api/invest/${campaign?._id}/invest`,
@@ -531,6 +550,10 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
     }
   };
 
+  const getImageUrl = (path: string) => {
+    return `http://localhost:5000${path}`;
+  };
+
   if (success) {
     return (
       <Drawer
@@ -549,7 +572,8 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
               Thank you for your donation!
             </Text>
             <Text align="center">
-              Your donation of ${donationAmount?.toFixed(2)} has been successfully processed.
+              Your donation of ${donationAmount?.toFixed(2)} has been
+              successfully processed.
             </Text>
             <Button onClick={others.onClose}>Close</Button>
           </Stack>
@@ -570,7 +594,7 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
         <Stack>
           <Flex gap="xs" align="center">
             <Image
-              src={campaign?.image}
+              src={getImageUrl(campaign?.image)}
               height={96}
               width={120}
               fit="contain"
@@ -704,7 +728,7 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
               </Text>
               <Group position="apart">
                 <Text>Your donation</Text>
-                <Text fw={500}>${donationAmount?.toFixed(2) || "0.00"}</Text>
+                <Text fw={500}>${donationAmount || "0.00"}</Text>
               </Group>
               <Group position="apart">
                 <Text>Fund Harbour tip</Text>
@@ -714,9 +738,9 @@ const DonationDrawer = ({ campaign, iconSize, ...others }: IProps) => {
                 <Text>Total due today</Text>
                 <Text fw={500}>${totalAmount.toFixed(2)}</Text>
               </Group>
-              <Button 
-                size="lg" 
-                onClick={handleDonation}
+              <Button
+                size="lg"
+                onClick={handleClick}
                 disabled={loading}
                 leftIcon={loading ? <Loader size="sm" /> : null}
               >
